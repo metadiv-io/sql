@@ -9,17 +9,19 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-var Connector = &connector{
-	LogLevel: logger.Error,
+// Connect returns a new connector.
+func Connect(silent ...bool) *connector {
+	var s bool = false
+	if len(silent) > 0 {
+		s = silent[0]
+	}
+	return &connector{
+		Silent: s,
+	}
 }
 
 type connector struct {
-	LogLevel logger.LogLevel
-}
-
-// SetLogLevel sets the log level for the connector.
-func (c *connector) SetLogLevel(level logger.LogLevel) {
-	c.LogLevel = level
+	Silent bool
 }
 
 // MySQL returns a new MySQL connection.
@@ -40,8 +42,16 @@ func (c *connector) SqliteMemory() (*gorm.DB, error) {
 	return gorm.Open(sqlite.Open("file::memory:?cache=shared"), c.gormConfig())
 }
 
+// SqliteMemoryWithName returns a new SQLite connection to an in-memory database with the given name.
+func (c *connector) SqliteMemoryWithName(name string) (*gorm.DB, error) {
+	return gorm.Open(sqlite.Open(fmt.Sprintf("file:%s?mode=memory&cache=shared", name)), c.gormConfig())
+}
+
 func (c *connector) gormConfig() *gorm.Config {
-	return &gorm.Config{
-		Logger: logger.Default.LogMode(c.LogLevel),
+	if c.Silent {
+		return &gorm.Config{
+			Logger: logger.Default.LogMode(logger.Silent),
+		}
 	}
+	return &gorm.Config{}
 }

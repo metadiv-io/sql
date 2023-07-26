@@ -24,7 +24,7 @@ var _ = Describe("test write", func() {
 	BeforeEach(func() {
 		var err error
 		pathName = uuid.New().String() + ".db"
-		DB, err = sql.Connector.Sqlite(pathName)
+		DB, err = sql.Connect(true).Sqlite(pathName)
 		Expect(err).To(BeNil())
 
 		err = DB.AutoMigrate(&User{})
