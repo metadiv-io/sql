@@ -83,7 +83,7 @@ var _ = Describe("test query", func() {
 	})
 
 	It("should be able to query with order", func() {
-		users, _, err := sql.FindAllComplex[User](DB, nil, sql.Order("age", false), nil)
+		users, _, err := sql.FindAllComplex[User](DB, DB, nil, sql.Order("age", false), nil)
 		Expect(err).To(BeNil())
 		Expect(len(users)).To(Equal(3))
 		Expect(users[0].Name).To(Equal("jerry"))
@@ -92,7 +92,7 @@ var _ = Describe("test query", func() {
 	})
 
 	It("should be able to query with pagination", func() {
-		users, pagination, err := sql.FindAllComplex[User](DB, nil, nil, sql.Page(1, 2))
+		users, pagination, err := sql.FindAllComplex[User](DB, DB, nil, nil, sql.Page(1, 2))
 		Expect(err).To(BeNil())
 		Expect(len(users)).To(Equal(2))
 		Expect(users[0].Name).To(Equal("peter"))
@@ -103,7 +103,7 @@ var _ = Describe("test query", func() {
 	})
 
 	It("should be able to query with order and pagination and clause", func() {
-		users, pagination, err := sql.FindAllComplex[User](DB, sql.Gte("age", 20), sql.Order("age", true), sql.Page(1, 2))
+		users, pagination, err := sql.FindAllComplex[User](DB, DB, sql.Gte("age", 20), sql.Order("age", true), sql.Page(1, 2))
 		Expect(err).To(BeNil())
 		Expect(len(users)).To(Equal(2))
 		Expect(users[0].Name).To(Equal("tom"))

@@ -39,40 +39,28 @@ func Count[T any](tx *gorm.DB, clause *Clause) (int64, error) {
 }
 
 // FindAllComplex finds all records that match the given clause and applies the given sort and pagination.
-func FindAllComplex[T any](tx *gorm.DB, clause *Clause, sort *Sort, pagination *Pagination) ([]T, *Pagination, error) {
+func FindAllComplex[T any](tx1 *gorm.DB, tx2 *gorm.DB, clause *Clause, sort *Sort, pagination *Pagination) ([]T, *Pagination, error) {
 
-	nonPtrTx := *tx
-	copyTx := nonPtrTx
-	tx2 := &copyTx
-
-	if clause != nil {
-		tx2 = clause.Consume(tx2)
-	}
+	var err error
 	if pagination != nil && pagination.Page > 0 && pagination.Size > 0 {
-		var count int64
-		err := tx2.Model(new(T)).Count(&count).Error
+		pagination.Total, err = Count[T](tx1, clause)
 		if err != nil {
 			return nil, nil, err
 		}
-		pagination.Total = count
 	} else {
 		pagination = nil
 	}
 
-	if clause != nil {
-		tx = clause.Consume(tx)
-	}
 	if sort != nil && sort.By != "" {
 		sort.By = safeField(sort.By)
 		if sort.By != "" {
-			tx = sort.Consume(tx)
+			tx2 = sort.Consume(tx2)
 		}
 	}
 	if pagination != nil && pagination.Page > 0 && pagination.Size > 0 {
-		tx = pagination.Consume(tx)
+		tx2 = pagination.Consume(tx2)
 	}
-	output := make([]T, 0)
-	err := tx.Find(&output).Error
+	output, err := FindAll[T](tx2, clause)
 	if err != nil {
 		return nil, nil, err
 	}
