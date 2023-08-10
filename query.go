@@ -42,7 +42,8 @@ func Count[T any](tx *gorm.DB, clause *Clause) (int64, error) {
 func FindAllComplex[T any](tx *gorm.DB, clause *Clause, sort *Sort, pagination *Pagination) ([]T, *Pagination, error) {
 	var err error
 	if pagination != nil && pagination.Page > 0 && pagination.Size > 0 {
-		pagination.Total, err = Count[T](tx, clause)
+		copyDB := tx
+		pagination.Total, err = Count[T](copyDB, clause)
 		if err != nil {
 			return nil, nil, err
 		}
