@@ -40,13 +40,16 @@ func Count[T any](tx *gorm.DB, clause *Clause) (int64, error) {
 
 // FindAllComplex finds all records that match the given clause and applies the given sort and pagination.
 func FindAllComplex[T any](tx *gorm.DB, clause *Clause, sort *Sort, pagination *Pagination) ([]T, *Pagination, error) {
-	var err error
+	if clause != nil {
+		tx = clause.Consume(tx)
+	}
 	if pagination != nil && pagination.Page > 0 && pagination.Size > 0 {
-		copyDB := tx
-		pagination.Total, err = Count[T](copyDB, clause)
+		var count int64
+		err := tx.Model(new(T)).Count(&count).Error
 		if err != nil {
 			return nil, nil, err
 		}
+		pagination.Total = count
 	} else {
 		pagination = nil
 	}
@@ -61,7 +64,7 @@ func FindAllComplex[T any](tx *gorm.DB, clause *Clause, sort *Sort, pagination *
 		tx = pagination.Consume(tx)
 	}
 	output := make([]T, 0)
-	err = tx.Find(&output).Error
+	err := tx.Find(&output).Error
 	if err != nil {
 		return nil, nil, err
 	}
