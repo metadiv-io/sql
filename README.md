@@ -1,22 +1,44 @@
-# sql
+# SQL Package Documentation
+
+The SQL package is a comprehensive Go library that facilitates seamless interaction with relational databases. Leveraging the power of GORM, it provides convenient connectors for MySQL and SQLite databases along with a flexible and expressive clause builder for constructing SQL queries.
 
 ## Installation
+
+To integrate the SQL package into your Go project, use the following `go get` command:
 
 ```bash
 go get -u github.com/metadiv-io/sql
 ```
 
-## Highlights
+## Connectors
 
-### Connectors
+### MySQL Connector
 
-* sql.Connector.MySQL(host, port, username, password, database string) (*gorm.DB, error)
+Establishes a connection to a MySQL database and returns a GORM database instance.
 
-* sql.Connector.Sqlite(path string) (*gorm.DB, error)
+```
+func Connector.MySQL(host, port, username, password, database string) (*gorm.DB, error)
+```
 
-* sql.Connector.SqliteMemory() (*gorm.DB, error)
+### SQLite Connector
 
-### Clause Builder
+Connects to an SQLite database using the specified file path.
+
+```
+func Connector.Sqlite(path string) (*gorm.DB, error)
+```
+
+### SQLite Memory Connector
+
+Creates an in-memory SQLite database and returns a GORM database instance.
+
+```
+func Connector.SqliteMemory() (*gorm.DB, error)
+```
+
+## Clause Builder
+
+The SQL package includes a powerful clause builder for constructing SQL queries. The following functions assist in creating clauses:
 
 * sql.Eq(field string, value interface{}) *Clause
 
@@ -50,7 +72,9 @@ go get -u github.com/metadiv-io/sql
 
 * sql.Or(children ...*Clause) *Clause
 
-### Query Functions
+## Query Functions
+
+The SQL package provides versatile query functions:
 
 * sql.FindOne[T](tx *gorm.DB, clause *Clause) (*T, error)
 
@@ -60,7 +84,9 @@ go get -u github.com/metadiv-io/sql
 
 * sql.FindAllComplex[T](tx *gorm.DB, clause *Clause, sort *Sort, pagination *Pagination) ([]T, *Pagination, error)
 
-### Write Functions
+## Write Functions
+
+For database modification operations, the SQL package offers convenient write functions:
 
 * Save[T](tx *gorm.DB, model *T) (*T, error)
 
