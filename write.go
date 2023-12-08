@@ -28,8 +28,8 @@ func Delete[T any](tx *gorm.DB, model *T) error {
 // DeleteAll deletes all the given models.
 func DeleteAll[T any](tx *gorm.DB, models []T) error {
 	txTemp := tx.Begin()
-	for _, model := range models {
-		err := txTemp.Delete(model).Error
+	for i := range models {
+		err := txTemp.Delete(&models[i]).Error
 		if err != nil {
 			txTemp.Rollback()
 			return err
