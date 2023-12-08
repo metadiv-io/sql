@@ -39,7 +39,7 @@ func (c *connector) Sqlite(path string) (*gorm.DB, error) {
 
 // SqliteMemory returns a new SQLite connection to an in-memory database.
 func (c *connector) SqliteMemory() (*gorm.DB, error) {
-	return gorm.Open(sqlite.Open("file::memory:?cache=shared"), c.gormConfig())
+	return gorm.Open(sqlite.Open("file::memory:?cache=shared&busy_timeout=5000"), c.gormConfig())
 }
 
 // SqliteMemoryWithName returns a new SQLite connection to an in-memory database with the given name.
